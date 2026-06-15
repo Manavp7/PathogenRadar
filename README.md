@@ -59,6 +59,9 @@ pytest
 uvicorn pathogenradar_api.main:app --reload
 ```
 
+If your Linux image does not include `python3-venv`, use `make api-install`
+to install the demo backend into the current user environment instead.
+
 Open:
 
 - API docs: <http://127.0.0.1:8000/docs>
