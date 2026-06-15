@@ -48,13 +48,21 @@ class OutbreakEvent:
         return math.exp(-((t - self.peak_day_offset) ** 2) / (2 * sigma * sigma))
 
 
-def dengue_outbreak(district_id: str, start: date, magnitude: float = 1.6) -> OutbreakEvent:
+def dengue_outbreak(
+    district_id: str,
+    start: date,
+    magnitude: float = 1.6,
+    duration_days: int = 50,
+    peak_day_offset: int = 22,
+) -> OutbreakEvent:
     """A vector-borne (dengue) outbreak: fever/rash searches, admissions, PCR, wastewater."""
     return OutbreakEvent(
         disease="Dengue",
         category=DiseaseCategory.VECTOR,
         district_id=district_id,
         start=start,
+        duration_days=duration_days,
+        peak_day_offset=peak_day_offset,
         magnitude=magnitude,
         signal_weights={
             SignalType.SEARCH_FEVER: 1.0,
