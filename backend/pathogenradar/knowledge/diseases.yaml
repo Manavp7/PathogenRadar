@@ -1,0 +1,67 @@
+# Disease knowledge base. Drives outbreak categorisation, likely-disease matching, and SEIR
+# parameters. Loaded into a graph (Disease <-> Symptom/Vector/Weather/Signal) by the
+# KnowledgeGraphRepo. Swappable to Neo4j later without touching application code.
+
+diseases:
+  dengue:
+    display_name: Dengue
+    category: Vector
+    vectors: [Aedes mosquito]
+    symptoms: [fever, rash, body_pain, headache, vomiting]
+    signals: [search_fever, search_rash, search_vomiting, hospital_admissions, icu_occupancy, lab_pcr_requests, social_mentions, wastewater_viral_load]
+    weather_drivers: {rainfall: positive, humidity: positive, temp: positive}
+    epi: {r0: 2.4, incubation_days: 5, infectious_days: 6, ifr: 0.001}
+
+  chikungunya:
+    display_name: Chikungunya
+    category: Vector
+    vectors: [Aedes mosquito]
+    symptoms: [fever, rash, body_pain, headache]
+    signals: [search_fever, search_rash, hospital_admissions, social_mentions]
+    weather_drivers: {rainfall: positive, humidity: positive, temp: positive}
+    epi: {r0: 2.0, incubation_days: 4, infectious_days: 5, ifr: 0.0005}
+
+  influenza_like:
+    display_name: Influenza-like illness
+    category: Respiratory
+    vectors: []
+    symptoms: [fever, cough, body_pain, headache]
+    signals: [search_fever, search_cough, hospital_admissions, icu_occupancy, ventilator_usage, lab_pcr_requests, social_mentions, wastewater_viral_load]
+    weather_drivers: {temp: negative, humidity: neutral, rainfall: neutral}
+    epi: {r0: 1.5, incubation_days: 2, infectious_days: 4, ifr: 0.001}
+
+  covid_like:
+    display_name: COVID-like respiratory syndrome
+    category: Respiratory
+    vectors: []
+    symptoms: [fever, cough, loss_of_smell, body_pain]
+    signals: [search_fever, search_cough, hospital_admissions, icu_occupancy, ventilator_usage, mortality, lab_pcr_requests, wastewater_viral_load]
+    weather_drivers: {temp: negative, humidity: neutral, rainfall: neutral}
+    epi: {r0: 3.0, incubation_days: 5, infectious_days: 7, ifr: 0.005}
+
+  cholera:
+    display_name: Cholera / acute diarrheal disease
+    category: Waterborne
+    vectors: [contaminated water]
+    symptoms: [diarrhea, vomiting, dehydration]
+    signals: [search_diarrhea, search_vomiting, hospital_admissions, lab_pcr_requests, social_mentions, wastewater_viral_load]
+    weather_drivers: {rainfall: positive, temp: positive, humidity: neutral}
+    epi: {r0: 1.8, incubation_days: 2, infectious_days: 5, ifr: 0.01}
+
+  leptospirosis:
+    display_name: Leptospirosis
+    category: Waterborne
+    vectors: [contaminated water, rodents]
+    symptoms: [fever, body_pain, headache, jaundice]
+    signals: [search_fever, hospital_admissions, icu_occupancy, mortality, lab_pcr_requests]
+    weather_drivers: {rainfall: positive, humidity: positive, temp: neutral}
+    epi: {r0: 1.3, incubation_days: 10, infectious_days: 7, ifr: 0.05}
+
+  food_poisoning:
+    display_name: Foodborne illness
+    category: Foodborne
+    vectors: [contaminated food]
+    symptoms: [vomiting, diarrhea, nausea]
+    signals: [search_vomiting, search_diarrhea, hospital_admissions, social_mentions]
+    weather_drivers: {temp: positive, humidity: positive, rainfall: neutral}
+    epi: {r0: 1.2, incubation_days: 1, infectious_days: 3, ifr: 0.002}
