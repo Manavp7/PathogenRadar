@@ -1,5 +1,4 @@
-from pathogenradar_api.domain.models import District, DiseaseState, SignalEmbedding, SignalSource
-
+from pathogenradar_api.domain.models import DiseaseState, District, SignalEmbedding, SignalSource
 
 SOURCE_WEIGHTS: dict[SignalSource, float] = {
     SignalSource.HOSPITAL: 1.35,

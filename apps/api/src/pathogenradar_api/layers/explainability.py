@@ -5,7 +5,6 @@ from pathogenradar_api.domain.models import (
     SignalEmbedding,
 )
 
-
 SOURCE_LABELS = {
     "hospital": "Hospital pressure",
     "search": "Search behavior spike",

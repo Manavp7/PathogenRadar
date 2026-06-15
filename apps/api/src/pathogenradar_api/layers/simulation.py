@@ -1,6 +1,5 @@
 from pathogenradar_api.domain.models import DiseaseState, InterventionType, SimulationRequest, SimulationResult
 
-
 EFFECTS: dict[InterventionType, float] = {
     InterventionType.SCHOOL_CLOSURE: 0.11,
     InterventionType.MASKING: 0.14,
