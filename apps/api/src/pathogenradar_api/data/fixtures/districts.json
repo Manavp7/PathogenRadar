@@ -1,0 +1,42 @@
+[
+  {
+    "id": "kerala-ernakulam",
+    "name": "Ernakulam",
+    "state": "Kerala",
+    "population": 3420000,
+    "latitude": 9.9816,
+    "longitude": 76.2999
+  },
+  {
+    "id": "kerala-thiruvananthapuram",
+    "name": "Thiruvananthapuram",
+    "state": "Kerala",
+    "population": 3301000,
+    "latitude": 8.5241,
+    "longitude": 76.9366
+  },
+  {
+    "id": "karnataka-bengaluru-urban",
+    "name": "Bengaluru Urban",
+    "state": "Karnataka",
+    "population": 9621000,
+    "latitude": 12.9716,
+    "longitude": 77.5946
+  },
+  {
+    "id": "maharashtra-mumbai",
+    "name": "Mumbai",
+    "state": "Maharashtra",
+    "population": 12442000,
+    "latitude": 19.076,
+    "longitude": 72.8777
+  },
+  {
+    "id": "delhi-new-delhi",
+    "name": "New Delhi",
+    "state": "Delhi",
+    "population": 142000,
+    "latitude": 28.6139,
+    "longitude": 77.209
+  }
+]

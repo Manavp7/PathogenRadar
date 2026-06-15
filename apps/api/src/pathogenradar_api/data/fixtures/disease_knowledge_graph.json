@@ -1,0 +1,48 @@
+{
+  "diseases": [
+    {
+      "name": "Dengue-like vector outbreak",
+      "category": "vector",
+      "symptoms": ["fever", "rash", "body_pain", "headache"],
+      "vectors": ["mosquito"],
+      "transmission": ["vector"],
+      "treatments": ["supportive care", "hydration", "platelet monitoring"],
+      "weather_dependencies": ["rainfall", "humidity", "standing_water"],
+      "population_risk": ["children", "elderly", "outdoor workers"],
+      "regions": ["Kerala", "Maharashtra"]
+    },
+    {
+      "name": "Influenza-like respiratory outbreak",
+      "category": "respiratory",
+      "symptoms": ["fever", "cough", "headache", "body_pain", "loss_of_smell"],
+      "vectors": [],
+      "transmission": ["droplet", "aerosol"],
+      "treatments": ["testing", "masking", "vaccination", "supportive care"],
+      "weather_dependencies": ["humidity", "indoor_crowding"],
+      "population_risk": ["elderly", "immunocompromised", "healthcare workers"],
+      "regions": ["Delhi", "Karnataka", "Kerala"]
+    },
+    {
+      "name": "Waterborne gastroenteritis outbreak",
+      "category": "waterborne",
+      "symptoms": ["vomiting", "diarrhea", "fever"],
+      "vectors": [],
+      "transmission": ["water", "food"],
+      "treatments": ["rehydration", "water sanitation", "stool testing"],
+      "weather_dependencies": ["floods", "rainfall", "water_contamination"],
+      "population_risk": ["children", "urban informal settlements"],
+      "regions": ["Maharashtra", "Kerala"]
+    },
+    {
+      "name": "Unknown respiratory anomaly",
+      "category": "unknown",
+      "symptoms": ["fever", "cough", "shortness_of_breath"],
+      "vectors": [],
+      "transmission": ["unknown"],
+      "treatments": ["enhanced surveillance", "diagnostic escalation"],
+      "weather_dependencies": [],
+      "population_risk": ["unknown"],
+      "regions": ["India"]
+    }
+  ]
+}

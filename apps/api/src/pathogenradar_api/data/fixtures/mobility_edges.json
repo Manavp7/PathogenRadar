@@ -1,0 +1,13 @@
+[
+  {"from_district_id":"kerala-ernakulam","to_district_id":"kerala-thiruvananthapuram","mode":"rail","weight":0.74},
+  {"from_district_id":"kerala-ernakulam","to_district_id":"karnataka-bengaluru-urban","mode":"road","weight":0.56},
+  {"from_district_id":"kerala-ernakulam","to_district_id":"maharashtra-mumbai","mode":"air","weight":0.42},
+  {"from_district_id":"kerala-thiruvananthapuram","to_district_id":"kerala-ernakulam","mode":"rail","weight":0.68},
+  {"from_district_id":"kerala-thiruvananthapuram","to_district_id":"karnataka-bengaluru-urban","mode":"air","weight":0.35},
+  {"from_district_id":"karnataka-bengaluru-urban","to_district_id":"maharashtra-mumbai","mode":"air","weight":0.62},
+  {"from_district_id":"karnataka-bengaluru-urban","to_district_id":"delhi-new-delhi","mode":"air","weight":0.58},
+  {"from_district_id":"maharashtra-mumbai","to_district_id":"delhi-new-delhi","mode":"air","weight":0.61},
+  {"from_district_id":"maharashtra-mumbai","to_district_id":"karnataka-bengaluru-urban","mode":"air","weight":0.55},
+  {"from_district_id":"delhi-new-delhi","to_district_id":"maharashtra-mumbai","mode":"air","weight":0.6},
+  {"from_district_id":"delhi-new-delhi","to_district_id":"karnataka-bengaluru-urban","mode":"air","weight":0.49}
+]
