@@ -1,0 +1,32 @@
+[project]
+name = "pathogenradar"
+version = "0.1.0"
+description = "PathogenRadar — a government-grade disease-intelligence platform (Phase 1 MVP, Kerala)"
+requires-python = ">=3.11"
+readme = "README.md"
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["backend", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]
+ignore = ["B008"]  # FastAPI uses function calls in defaults (Depends/Query)
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["backend"]
+filterwarnings = ["ignore::DeprecationWarning"]

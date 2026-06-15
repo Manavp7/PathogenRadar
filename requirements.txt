@@ -1,0 +1,16 @@
+# PathogenRadar backend runtime dependencies (Phase 1)
+# Platform runs fully offline with zero external AI dependencies.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+numpy==2.2.1
+pandas==2.2.3
+scikit-learn==1.6.0
+statsmodels==0.14.4
+networkx==3.4.2
+pyyaml==6.0.2
+pyarrow==18.1.0
+python-dotenv==1.0.1
+requests==2.32.3
+# Optional real public-data connector (Google Trends). Degrades gracefully if unavailable.
+pytrends==4.9.2
