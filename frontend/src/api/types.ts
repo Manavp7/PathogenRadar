@@ -137,3 +137,14 @@ export interface Timeline {
   dates: string[];
   series: TimelinePoint[];
 }
+
+export interface SystemStatus {
+  version: string;
+  region: string;
+  offline_mode: boolean;
+  connectors: Record<string, { enabled: boolean; live: boolean }>;
+  llm: { provider: string; key_present: boolean; required: boolean };
+  security: { api_key_required: boolean };
+  data: { as_of: string | null; source_summary: Record<string, string> };
+  warnings: string[];
+}

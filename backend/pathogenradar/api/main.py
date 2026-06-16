@@ -22,6 +22,7 @@ from . import (
     routes_risk,
     routes_signals,
     routes_simulation,
+    routes_system,
 )
 from .errors import register_exception_handlers
 from .state import state
@@ -62,6 +63,10 @@ async def audit_middleware(request: Request, call_next):
 
 @app.on_event("startup")
 def _startup() -> None:
+    from ..config import get_settings
+
+    for warning in get_settings().warnings():
+        logger.warning("config: %s", warning)
     state.ensure_seed()
     logger.info("PathogenRadar API ready (region=%s)", state.meta.get("region"))
 
@@ -80,3 +85,4 @@ app.include_router(routes_alerts.router, dependencies=_auth)
 app.include_router(routes_simulation.router, dependencies=_auth)
 app.include_router(routes_signals.router, dependencies=_auth)
 app.include_router(routes_reports.router, dependencies=_auth)
+app.include_router(routes_system.router, dependencies=_auth)

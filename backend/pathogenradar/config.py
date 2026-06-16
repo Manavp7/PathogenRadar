@@ -74,6 +74,31 @@ class Settings:
         """True when no external services are configured (the default state)."""
         return not (self.openweather_api_key or self.enable_google_trends)
 
+    def llm_key_present(self) -> bool:
+        """Whether the selected LLM provider has a usable credential."""
+        provider = (self.llm_provider or "template").lower()
+        return {
+            "template": True,  # never needs a key
+            "ollama": True,  # local daemon, no key
+            "openai": bool(self.openai_api_key),
+            "anthropic": bool(self.anthropic_api_key),
+            "gemini": bool(self.gemini_api_key),
+        }.get(provider, True)
+
+    def warnings(self) -> list[str]:
+        """Non-fatal configuration warnings (logged at startup, surfaced via /api/system)."""
+        out: list[str] = []
+        provider = (self.llm_provider or "template").lower()
+        if provider in {"openai", "anthropic", "gemini"} and not self.llm_key_present():
+            out.append(
+                f"LLM_PROVIDER='{provider}' but no API key set — briefings fall back to template."
+            )
+        if provider not in {"template", "openai", "anthropic", "gemini", "ollama"}:
+            out.append(f"Unknown LLM_PROVIDER='{provider}' — using template.")
+        if self.enable_google_trends:
+            out.append("Google Trends enabled — live pulls may be rate-limited; cached on success.")
+        return out
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

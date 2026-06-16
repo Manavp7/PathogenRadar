@@ -11,6 +11,7 @@ import type {
   SeirResult,
   SignalSeries,
   SourceReliability,
+  SystemStatus,
   Timeline,
 } from "./types";
 
@@ -43,6 +44,7 @@ export const api = {
   sources: () => get<Record<string, SourceReliability>>("/api/sources"),
   signals: (id: string) => get<SignalSeries>(`/api/signals/${id}`),
   diseases: () => get<DiseaseInfo[]>("/api/diseases"),
+  system: () => get<SystemStatus>("/api/system"),
   briefing: () => get<Briefing>("/api/reports/briefing"),
   simulate: (body: {
     district_id: string;

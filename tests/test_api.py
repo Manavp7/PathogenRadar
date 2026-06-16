@@ -90,6 +90,16 @@ def test_signals_endpoint(client):
     assert "hospital_admissions" in sig["series"]
 
 
+def test_system_status(client):
+    sys = client.get("/api/system").json()
+    assert sys["offline_mode"] is True  # default: no external services
+    assert sys["connectors"]["synthetic"]["enabled"] is True
+    assert sys["llm"]["provider"] == "template"
+    assert sys["llm"]["required"] is False
+    assert sys["security"]["api_key_required"] is False
+    assert isinstance(sys["warnings"], list)
+
+
 def test_timeline_and_historical_snapshot(client):
     timeline = client.get("/api/timeline").json()
     assert len(timeline["dates"]) > 30

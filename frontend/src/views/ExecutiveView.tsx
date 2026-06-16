@@ -2,6 +2,7 @@ import type { AppData } from "../App";
 import AlertCard from "../components/AlertCard";
 import BriefingPanel from "../components/BriefingPanel";
 import RiskTable from "../components/RiskTable";
+import SystemStatus from "../components/SystemStatus";
 import { KpiCard } from "../components/common";
 import { fmtPct } from "../lib/format";
 
@@ -92,7 +93,10 @@ export default function ExecutiveView({
             </div>
           )}
         </div>
-        <BriefingPanel />
+        <div className="grid" style={{ gap: 18, alignContent: "start" }}>
+          <BriefingPanel />
+          <SystemStatus />
+        </div>
       </div>
     </div>
   );
