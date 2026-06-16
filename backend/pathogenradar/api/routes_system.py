@@ -47,9 +47,7 @@ def get_system() -> dict:
             "rl_alert_threshold": _rl_threshold(),
         },
         "security": {"api_key_required": bool(s.api_key)},
-        "data": {
-            "as_of": state.meta.get("as_of"),
-            "source_summary": state.meta.get("source_summary", {}),
-        },
+        "regions": state.available(),
+        "default_region": state.default_region,
         "warnings": s.warnings(),
     }

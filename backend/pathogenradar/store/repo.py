@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from ..config import SEED_DIR, ensure_dirs
+from ..config import SEED_DIR
 from ..domain.models import SignalRecord
 
 SIGNALS_PARQUET = "signals.parquet"
@@ -20,8 +20,19 @@ ALERTS_JSON = "alerts.json"
 CATALOG_DB = "catalog.db"
 
 
-def _path(name: str) -> Path:
-    return SEED_DIR / name
+def _region() -> str:
+    from ..config import get_settings
+
+    return get_settings().region
+
+
+def region_dir(region: str | None = None) -> Path:
+    d = SEED_DIR / (region or _region())
+    return d
+
+
+def _path(name: str, region: str | None = None) -> Path:
+    return region_dir(region) / name
 
 
 # --------------------------------------------------------------------------------------
@@ -44,16 +55,16 @@ def signals_to_frame(records: list[SignalRecord]) -> pd.DataFrame:
     )
 
 
-def write_signals(df: pd.DataFrame) -> Path:
-    ensure_dirs()
-    path = _path(SIGNALS_PARQUET)
+def write_signals(df: pd.DataFrame, region: str | None = None) -> Path:
+    region_dir(region).mkdir(parents=True, exist_ok=True)
+    path = _path(SIGNALS_PARQUET, region)
     df.to_parquet(path, index=False)
-    _register(SIGNALS_PARQUET, len(df))
+    _register(SIGNALS_PARQUET, len(df), region)
     return path
 
 
-def read_signals() -> pd.DataFrame:
-    path = _path(SIGNALS_PARQUET)
+def read_signals(region: str | None = None) -> pd.DataFrame:
+    path = _path(SIGNALS_PARQUET, region)
     if not path.exists():
         return pd.DataFrame(columns=["district_id", "date", "signal_type", "value", "source_id"])
     df = pd.read_parquet(path)
@@ -66,16 +77,16 @@ def read_signals() -> pd.DataFrame:
 # --------------------------------------------------------------------------------------
 
 
-def write_frame(df: pd.DataFrame, name: str) -> Path:
-    ensure_dirs()
-    path = _path(name)
+def write_frame(df: pd.DataFrame, name: str, region: str | None = None) -> Path:
+    region_dir(region).mkdir(parents=True, exist_ok=True)
+    path = _path(name, region)
     df.to_parquet(path, index=False)
-    _register(name, len(df))
+    _register(name, len(df), region)
     return path
 
 
-def read_frame(name: str) -> pd.DataFrame:
-    path = _path(name)
+def read_frame(name: str, region: str | None = None) -> pd.DataFrame:
+    path = _path(name, region)
     if not path.exists():
         return pd.DataFrame()
     df = pd.read_parquet(path)
@@ -89,16 +100,16 @@ def read_frame(name: str) -> pd.DataFrame:
 # --------------------------------------------------------------------------------------
 
 
-def write_json(obj, name: str) -> Path:
-    ensure_dirs()
-    path = _path(name)
+def write_json(obj, name: str, region: str | None = None) -> Path:
+    region_dir(region).mkdir(parents=True, exist_ok=True)
+    path = _path(name, region)
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(obj, fh, default=str, indent=2)
     return path
 
 
-def read_json(name: str, default=None):
-    path = _path(name)
+def read_json(name: str, default=None, region: str | None = None):
+    path = _path(name, region)
     if not path.exists():
         return default
     with open(path, encoding="utf-8") as fh:
@@ -110,9 +121,9 @@ def read_json(name: str, default=None):
 # --------------------------------------------------------------------------------------
 
 
-def _register(artifact: str, rows: int) -> None:
-    ensure_dirs()
-    con = sqlite3.connect(_path(CATALOG_DB))
+def _register(artifact: str, rows: int, region: str | None = None) -> None:
+    region_dir(region).mkdir(parents=True, exist_ok=True)
+    con = sqlite3.connect(_path(CATALOG_DB, region))
     try:
         con.execute(
             "CREATE TABLE IF NOT EXISTS catalog ("
@@ -129,8 +140,8 @@ def _register(artifact: str, rows: int) -> None:
         con.close()
 
 
-def catalog() -> list[dict]:
-    db = _path(CATALOG_DB)
+def catalog(region: str | None = None) -> list[dict]:
+    db = _path(CATALOG_DB, region)
     if not db.exists():
         return []
     con = sqlite3.connect(db)

@@ -32,22 +32,25 @@ def active_model() -> str:
 def forecast_current(
     current_risk: dict[str, float],
     horizons: list[int] | None = None,
+    region: str | None = None,
 ) -> list[DistrictForecast]:
     horizons = horizons or DEFAULT_HORIZONS
     if active_model() == "gnn":
         try:
-            from .gnn import forecast_spread_gnn
+            from .gnn import forecast_spread_gnn, gnn_available
 
-            return forecast_spread_gnn(current_risk, horizons)
+            if gnn_available(region):
+                return forecast_spread_gnn(current_risk, horizons, region)
         except Exception as exc:  # noqa: BLE001 - never fail a forecast
             logger.warning("GNN forecast failed (%s) — falling back to deterministic", exc)
-    return forecast_spread(current_risk, horizons)
+    return forecast_spread(current_risk, horizons, region=region)
 
 
 def forecast_from_assessments(
     assessments: list[RiskAssessment],
     horizons: list[int] | None = None,
+    region: str | None = None,
 ) -> list[DistrictForecast]:
     latest = latest_by_district(assessments)
     current_risk = {d: a.risk_score for d, a in latest.items()}
-    return forecast_current(current_risk, horizons or DEFAULT_HORIZONS)
+    return forecast_current(current_risk, horizons or DEFAULT_HORIZONS, region)

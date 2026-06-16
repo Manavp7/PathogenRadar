@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from ..domain.models import Intervention, SeirResult
@@ -21,7 +21,7 @@ class SimulationRequest(BaseModel):
 
 
 @router.post("/simulation", response_model=SeirResult)
-def run_simulation(req: SimulationRequest) -> SeirResult:
+def run_simulation(req: SimulationRequest, region: str | None = Query(default=None)) -> SeirResult:
     kg = get_knowledge_graph()
     if req.disease not in kg.diseases():
         raise HTTPException(status_code=400, detail=f"Unknown disease '{req.disease}'")
@@ -33,6 +33,7 @@ def run_simulation(req: SimulationRequest) -> SeirResult:
             days=req.days,
             initial_infected=req.initial_infected,
             kg=kg,
+            region=region,
         )
     except KeyError:
         raise HTTPException(

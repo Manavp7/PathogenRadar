@@ -92,3 +92,15 @@ kerala:
       lat: 8.5241
       lon: 76.9366
       neighbors: [kollam]
+
+# Tamil Nadu is defined WITHOUT an explicit district list: districts (centroids, populations,
+# adjacency) are auto-derived from the GeoJSON at load time. This demonstrates that adding a
+# state is configuration, not re-engineering. Populations are area-share estimates of the
+# state total (2011 census) — clearly approximate for a second-region demo.
+tamil_nadu:
+  name: Tamil Nadu
+  country: India
+  geojson: tamil_nadu_districts.geojson
+  geojson_name_property: DISTRICT
+  derive_from_geojson: true
+  total_population: 72147030

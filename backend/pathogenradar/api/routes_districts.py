@@ -1,33 +1,45 @@
-"""Reference endpoints: districts, geo, metadata, source reliability."""
+"""Reference endpoints: regions, districts, geo, metadata, source reliability."""
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from .state import state
+from .deps import region_state
+from .state import RegionState, state
 
 router = APIRouter(prefix="/api", tags=["reference"])
 
 
-@router.get("/meta")
-def get_meta() -> dict:
+@router.get("/regions")
+def get_regions() -> dict:
     return {
-        **state.meta,
-        "districts": len(state.districts()),
-        "active_alerts": len(state.alerts),
+        "default": state.default_region,
+        "regions": [
+            {"key": k, "name": rs.meta.get("region", k), "districts": len(rs.districts())}
+            for k, rs in state.regions.items()
+        ],
+    }
+
+
+@router.get("/meta")
+def get_meta(rs: RegionState = Depends(region_state)) -> dict:
+    return {
+        **rs.meta,
+        "districts": len(rs.districts()),
+        "active_alerts": len(rs.alerts),
     }
 
 
 @router.get("/districts")
-def get_districts_route() -> list[dict]:
-    return state.districts()
+def get_districts_route(rs: RegionState = Depends(region_state)) -> list[dict]:
+    return rs.districts()
 
 
 @router.get("/geojson")
-def get_geojson() -> dict:
-    return state.geojson()
+def get_geojson(rs: RegionState = Depends(region_state)) -> dict:
+    return rs.geojson()
 
 
 @router.get("/sources")
-def get_sources() -> dict:
-    return state.sources
+def get_sources(rs: RegionState = Depends(region_state)) -> dict:
+    return rs.sources

@@ -8,6 +8,7 @@ import RiskTable from "../components/RiskTable";
 import TimeMachine from "../components/TimeMachine";
 import { KpiCard } from "../components/common";
 import { riskColor, shortDate } from "../lib/format";
+import { useRegion } from "../lib/region";
 
 export default function Overview({
   data,
@@ -16,6 +17,7 @@ export default function Overview({
   data: AppData;
   onSelect: (id: string) => void;
 }) {
+  const region = useRegion();
   const [histDate, setHistDate] = useState<string | null>(null);
   const [histRisk, setHistRisk] = useState<RiskAssessment[] | null>(null);
 
@@ -25,11 +27,11 @@ export default function Overview({
       return;
     }
     let cancelled = false;
-    api.riskAt(histDate).then((r) => !cancelled && setHistRisk(r)).catch(() => {});
+    api.riskAt(histDate, region).then((r) => !cancelled && setHistRisk(r)).catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [histDate]);
+  }, [histDate, region]);
 
   const mapRisk = histRisk ?? data.risk;
   const onAlert = data.risk.filter((r) => r.level !== "Normal");

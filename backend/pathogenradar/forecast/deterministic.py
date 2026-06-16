@@ -26,14 +26,15 @@ def forecast_spread(
     beta: float = 0.085,
     intrinsic: float = 0.04,
     graph: nx.Graph | None = None,
+    region: str | None = None,
 ) -> list[DistrictForecast]:
     """Forecast per-district spread probability at the given horizons.
 
     ``current_risk`` maps district_id -> risk score (0..100).
     """
     horizons = sorted(horizons or DEFAULT_HORIZONS)
-    graph = graph if graph is not None else build_district_graph()
-    names = get_district_map()
+    graph = graph if graph is not None else build_district_graph(region)
+    names = get_district_map(region)
 
     nodes = list(graph.nodes())
     p = {n: max(0.0, min(1.0, current_risk.get(n, 0.0) / 100.0)) for n in nodes}

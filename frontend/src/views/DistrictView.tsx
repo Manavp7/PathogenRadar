@@ -8,6 +8,7 @@ import SeirSimulator from "../components/SeirSimulator";
 import SignalBreakdown from "../components/SignalBreakdown";
 import { Badge, Spinner } from "../components/common";
 import { fmtPct, riskColor } from "../lib/format";
+import { useRegion } from "../lib/region";
 
 export default function DistrictView({
   data,
@@ -18,6 +19,7 @@ export default function DistrictView({
   districtId: string;
   onSelect: (id: string) => void;
 }) {
+  const region = useRegion();
   const [detail, setDetail] = useState<RiskDetail | null>(null);
   const [forecast, setForecast] = useState<DistrictForecast | null>(null);
   const [signals, setSignals] = useState<SignalSeries | null>(null);
@@ -25,10 +27,10 @@ export default function DistrictView({
   useEffect(() => {
     setDetail(null);
     setSignals(null);
-    api.riskDetail(districtId).then(setDetail).catch(() => setDetail(null));
-    api.signals(districtId).then(setSignals).catch(() => setSignals(null));
+    api.riskDetail(districtId, region).then(setDetail).catch(() => setDetail(null));
+    api.signals(districtId, region).then(setSignals).catch(() => setSignals(null));
     setForecast(data.forecast.find((f) => f.district_id === districtId) ?? null);
-  }, [districtId, data.forecast]);
+  }, [districtId, data.forecast, region]);
 
   if (!detail) return <Spinner label="Loading district intelligence…" />;
   const a = detail.latest;

@@ -34,6 +34,7 @@ DEFAULT_DAYS = 180
 @dataclass
 class PipelineResult:
     region: str
+    region_key: str
     start: date
     end: date
     as_of: date
@@ -52,13 +53,19 @@ def run_pipeline(
     end: date | None = None,
     outbreaks: list[OutbreakEvent] | None = None,
     persist: bool = True,
+    region: str | None = None,
 ) -> PipelineResult:
+    from .config import get_settings
+
+    region = region or get_settings().region
     end = end or date.today()
     start = start or (end - timedelta(days=DEFAULT_DAYS))
-    logger.info("pipeline run %s..%s outbreaks=%d", start, end, len(outbreaks or []))
+    logger.info(
+        "pipeline run region=%s %s..%s outbreaks=%d", region, start, end, len(outbreaks or [])
+    )
 
     # 1. Acquire (synthetic + any enabled real connectors)
-    acq = acquire(start, end, outbreaks=outbreaks)
+    acq = acquire(start, end, outbreaks=outbreaks, region=region)
     raw = repo.signals_to_frame(acq.records)
 
     # 2. Data quality + confidence
@@ -73,10 +80,10 @@ def run_pipeline(
     scores_df = scores_to_frame(scores)
 
     # 5. Fusion + outbreak detection + explainability
-    assessments = assess(scores, agg, conf_by_day)
+    assessments = assess(scores, agg, conf_by_day, region=region)
 
-    # 6. Deterministic spread forecast
-    forecasts = forecast_from_assessments(assessments)
+    # 6. Spread forecast
+    forecasts = forecast_from_assessments(assessments, region=region)
 
     # 7. Alerting (latest per district)
     latest = list(latest_by_district(assessments).values())
@@ -85,7 +92,8 @@ def run_pipeline(
     risk_ts = _risk_timeseries(assessments)
 
     result = PipelineResult(
-        region=get_region_name(),
+        region=get_region_name(region),
+        region_key=region,
         start=start,
         end=end,
         as_of=end,
@@ -100,7 +108,7 @@ def run_pipeline(
     )
 
     if persist:
-        _persist(result, raw)
+        _persist(result, raw, region)
     return result
 
 
@@ -109,6 +117,7 @@ def golden_scenario(
     as_of: date | None = None,
     magnitude: float = 2.4,
     persist: bool = True,
+    region: str | None = None,
 ) -> PipelineResult:
     """The flagship demo: a sharp, recent dengue outbreak peaking near 'now'.
 
@@ -126,7 +135,7 @@ def golden_scenario(
         duration_days=32,
         peak_day_offset=12,
     )
-    return run_pipeline(start, end, outbreaks=[outbreak], persist=persist)
+    return run_pipeline(start, end, outbreaks=[outbreak], persist=persist, region=region)
 
 
 def _risk_timeseries(assessments: list[RiskAssessment]) -> pd.DataFrame:
@@ -145,29 +154,32 @@ def _risk_timeseries(assessments: list[RiskAssessment]) -> pd.DataFrame:
     )
 
 
-def _persist(result: PipelineResult, raw: pd.DataFrame) -> None:
-    repo.write_signals(raw)
-    repo.write_frame(result.risk_timeseries, repo.RISK_PARQUET)
+def _persist(result: PipelineResult, raw: pd.DataFrame, region: str) -> None:
+    repo.write_signals(raw, region)
+    repo.write_frame(result.risk_timeseries, repo.RISK_PARQUET, region)
     if not result.signal_scores_df.empty:
-        repo.write_frame(result.signal_scores_df, "signal_scores.parquet")
+        repo.write_frame(result.signal_scores_df, "signal_scores.parquet", region)
 
     latest = list(latest_by_district(result.assessments).values())
     latest.sort(key=lambda a: a.risk_score, reverse=True)
-    repo.write_json([a.model_dump(mode="json") for a in latest], "risk_latest.json")
-    repo.write_json([f.model_dump(mode="json") for f in result.forecasts], "forecasts.json")
-    repo.write_json([al.model_dump(mode="json") for al in result.alerts], repo.ALERTS_JSON)
+    repo.write_json([a.model_dump(mode="json") for a in latest], "risk_latest.json", region)
+    repo.write_json([f.model_dump(mode="json") for f in result.forecasts], "forecasts.json", region)
+    repo.write_json([al.model_dump(mode="json") for al in result.alerts], repo.ALERTS_JSON, region)
     repo.write_json(
         {sid: s.model_dump(mode="json") for sid, s in result.quality.source_reliability.items()},
         "sources.json",
+        region,
     )
     repo.write_json(
         {
             "region": result.region,
+            "region_key": result.region_key,
             "start": result.start.isoformat(),
             "end": result.end.isoformat(),
             "as_of": result.as_of.isoformat(),
             "source_summary": result.source_summary,
         },
         "meta.json",
+        region,
     )
-    logger.info("persisted pipeline artifacts to %s", repo.SEED_DIR)
+    logger.info("persisted pipeline artifacts to %s", repo.region_dir(region))

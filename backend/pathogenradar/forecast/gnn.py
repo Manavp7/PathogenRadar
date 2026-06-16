@@ -181,7 +181,7 @@ def forecast_spread_gnn(
     model_horizons = meta["horizons"]
     horizons = horizons or model_horizons
 
-    _, w = mobility_matrix()
+    _, w = mobility_matrix(region=region)
     a_hat = torch.tensor(normalized_adjacency(w), dtype=torch.float32)
     pop_norm = _pop_norm(node_ids)
     x = torch.tensor(

@@ -51,9 +51,10 @@ def acquire(
     start: date,
     end: date,
     outbreaks: list[OutbreakEvent] | None = None,
+    region: str | None = None,
 ) -> AcquisitionResult:
     """Acquire signals from all active connectors for the date range."""
-    districts = get_districts()
+    districts = get_districts(region)
     results: list[FetchResult] = []
     records: list[SignalRecord] = []
 

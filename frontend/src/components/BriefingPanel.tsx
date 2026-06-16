@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import { marked } from "marked";
 import { api } from "../api/client";
 import type { Briefing } from "../api/types";
+import { useRegion } from "../lib/region";
 
 export default function BriefingPanel() {
+  const region = useRegion();
   const [briefing, setBriefing] = useState<Briefing | null>(null);
   const [err, setErr] = useState(false);
 
   useEffect(() => {
-    api.briefing().then(setBriefing).catch(() => setErr(true));
-  }, []);
+    api.briefing(region).then(setBriefing).catch(() => setErr(true));
+  }, [region]);
 
   function download() {
     if (!briefing) return;

@@ -12,9 +12,11 @@ import numpy as np
 from ..regions import build_district_graph
 
 
-def mobility_matrix(graph: nx.Graph | None = None) -> tuple[list[str], np.ndarray]:
+def mobility_matrix(
+    graph: nx.Graph | None = None, region: str | None = None
+) -> tuple[list[str], np.ndarray]:
     """Return (node_ids, W) where W[i, j] is the gravity mobility weight between districts."""
-    graph = graph if graph is not None else build_district_graph()
+    graph = graph if graph is not None else build_district_graph(region)
     nodes = list(graph.nodes())
     idx = {n: i for i, n in enumerate(nodes)}
     n = len(nodes)
@@ -34,8 +36,8 @@ def normalized_adjacency(w: np.ndarray) -> np.ndarray:
     return dinv @ a @ dinv
 
 
-def populations(node_ids: list[str]) -> np.ndarray:
+def populations(node_ids: list[str], region: str | None = None) -> np.ndarray:
     from ..regions import get_district_map
 
-    dmap = get_district_map()
+    dmap = get_district_map(region)
     return np.array([float(dmap[n].population) for n in node_ids])

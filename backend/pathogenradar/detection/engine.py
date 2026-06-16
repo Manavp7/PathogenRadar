@@ -38,10 +38,11 @@ def assess(
     agg_df: pd.DataFrame,
     confidence_by_day: dict[tuple[str, date], float] | None = None,
     kg: KnowledgeGraphRepo | None = None,
+    region: str | None = None,
 ) -> list[RiskAssessment]:
     kg = kg or get_knowledge_graph()
     confidence_by_day = confidence_by_day or {}
-    names = get_district_map()
+    names = get_district_map(region)
     novelty_detector = get_novelty_detector()
 
     grouped = _group_scores(signal_scores)

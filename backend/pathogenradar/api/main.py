@@ -18,6 +18,7 @@ from . import (
     routes_alerts,
     routes_districts,
     routes_forecast,
+    routes_national,
     routes_reports,
     routes_risk,
     routes_signals,
@@ -68,12 +69,12 @@ def _startup() -> None:
     for warning in get_settings().warnings():
         logger.warning("config: %s", warning)
     state.ensure_seed()
-    logger.info("PathogenRadar API ready (region=%s)", state.meta.get("region"))
+    logger.info("PathogenRadar API ready (regions=%s)", state.available())
 
 
 @app.get("/health", tags=["system"])
 def health() -> dict:
-    return {"status": "ok", "version": __version__, "region": state.meta.get("region")}
+    return {"status": "ok", "version": __version__, "regions": state.available()}
 
 
 # All data routes require the API key when one is configured.
@@ -86,3 +87,4 @@ app.include_router(routes_simulation.router, dependencies=_auth)
 app.include_router(routes_signals.router, dependencies=_auth)
 app.include_router(routes_reports.router, dependencies=_auth)
 app.include_router(routes_system.router, dependencies=_auth)
+app.include_router(routes_national.router, dependencies=_auth)

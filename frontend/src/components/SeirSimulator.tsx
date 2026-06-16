@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import type { DiseaseInfo, Intervention, SeirResult } from "../api/types";
 import { fmtInt } from "../lib/format";
+import { useRegion } from "../lib/region";
 import { SeirChart } from "./Charts";
 
 const LEVERS: { key: keyof Intervention; label: string }[] = [
@@ -20,6 +21,7 @@ export default function SeirSimulator({
   diseases: DiseaseInfo[];
   defaultDisease?: string;
 }) {
+  const region = useRegion();
   const [disease, setDisease] = useState(defaultDisease ?? "dengue");
   const [iv, setIv] = useState<Intervention>({
     school_closure: 0.5,
@@ -35,7 +37,7 @@ export default function SeirSimulator({
     setLoading(true);
     const t = setTimeout(() => {
       api
-        .simulate({ district_id: districtId, disease, days: 160, intervention: iv })
+        .simulate({ district_id: districtId, disease, days: 160, intervention: iv }, region)
         .then((r) => !cancelled && setResult(r))
         .catch(() => !cancelled && setResult(null))
         .finally(() => !cancelled && setLoading(false));
@@ -44,7 +46,7 @@ export default function SeirSimulator({
       cancelled = true;
       clearTimeout(t);
     };
-  }, [districtId, disease, iv]);
+  }, [districtId, disease, iv, region]);
 
   return (
     <div className="panel">

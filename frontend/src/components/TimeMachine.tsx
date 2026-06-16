@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../api/client";
 import type { Timeline } from "../api/types";
 import { riskColor, shortDate } from "../lib/format";
+import { useRegion } from "../lib/region";
 
 /**
  * Scrub / animate through historical risk snapshots. Emits the selected date, or null when
  * viewing the latest ("live") snapshot.
  */
 export default function TimeMachine({ onChange }: { onChange: (date: string | null) => void }) {
+  const region = useRegion();
   const [timeline, setTimeline] = useState<Timeline | null>(null);
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -15,13 +17,13 @@ export default function TimeMachine({ onChange }: { onChange: (date: string | nu
 
   useEffect(() => {
     api
-      .timeline()
+      .timeline(region)
       .then((t) => {
         setTimeline(t);
         setIdx(t.dates.length - 1);
       })
       .catch(() => setTimeline(null));
-  }, []);
+  }, [region]);
 
   useEffect(() => {
     if (!playing || !timeline) return;

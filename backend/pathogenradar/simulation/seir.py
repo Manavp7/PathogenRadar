@@ -76,9 +76,10 @@ def simulate(
     days: int = 160,
     initial_infected: float | None = None,
     kg: KnowledgeGraphRepo | None = None,
+    region: str | None = None,
 ) -> SeirResult:
     kg = kg or get_knowledge_graph()
-    district = get_district(district_id)
+    district = get_district(district_id, region)
     epi = kg.epi_params(disease)
 
     population = float(district.population)
