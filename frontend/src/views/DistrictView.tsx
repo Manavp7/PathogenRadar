@@ -63,7 +63,20 @@ export default function DistrictView({
         </div>
       </div>
 
-      {a.likely_diseases.length > 0 && (
+      {a.novel_pathogen && (
+        <div
+          className="panel"
+          style={{ padding: "12px 16px", borderColor: "var(--emergency)", background: "#e5184a14" }}
+        >
+          <b style={{ color: "var(--emergency)" }}>⚠ Novel / unknown pathogen signal</b>{" "}
+          <span className="muted">
+            — this presentation matches no known disease profile (novelty{" "}
+            {Math.round((a.novelty_score ?? 0) * 100)}%). Recommend field investigation &
+            metagenomic testing.
+          </span>
+        </div>
+      )}
+      {!a.novel_pathogen && a.likely_diseases.length > 0 && (
         <div className="panel" style={{ padding: "12px 16px" }}>
           <span className="muted">Most likely: </span>
           <span className="pill-row" style={{ display: "inline-flex" }}>
@@ -73,6 +86,11 @@ export default function DistrictView({
               </span>
             ))}
           </span>
+          {a.novelty_score != null && a.novelty_score > 0 && (
+            <span className="faint" style={{ marginLeft: 10, fontSize: 12 }}>
+              novelty {Math.round(a.novelty_score * 100)}%
+            </span>
+          )}
         </div>
       )}
 

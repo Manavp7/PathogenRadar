@@ -106,6 +106,35 @@ def respiratory_outbreak(
     )
 
 
+def novel_outbreak(
+    district_id: str,
+    start: date,
+    magnitude: float = 2.2,
+    duration_days: int = 32,
+    peak_day_offset: int = 12,
+) -> OutbreakEvent:
+    """An *unknown* pathogen: a cross-category presentation matching no known disease profile
+    (respiratory + enteric + haemorrhagic + critical-care signals simultaneously)."""
+    return OutbreakEvent(
+        disease="Unknown pathogen",
+        category=DiseaseCategory.UNKNOWN,
+        district_id=district_id,
+        start=start,
+        duration_days=duration_days,
+        peak_day_offset=peak_day_offset,
+        magnitude=magnitude,
+        signal_weights={
+            SignalType.SEARCH_COUGH: 1.0,
+            SignalType.SEARCH_DIARRHEA: 1.0,
+            SignalType.SEARCH_RASH: 1.0,
+            SignalType.VENTILATOR_USAGE: 0.9,
+            SignalType.MORTALITY: 0.9,
+            SignalType.ICU_OCCUPANCY: 0.8,
+            SignalType.HOSPITAL_ADMISSIONS: 0.8,
+        },
+    )
+
+
 def waterborne_outbreak(
     district_id: str,
     start: date,

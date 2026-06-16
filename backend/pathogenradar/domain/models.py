@@ -157,6 +157,8 @@ class RiskAssessment(BaseModel):
     confidence: float  # 0..1 (from data quality)
     signal_scores: dict[str, float] = Field(default_factory=dict)  # detector -> score
     contributions: list[Contribution] = Field(default_factory=list)
+    novelty_score: float = 0.0  # 0..1 — how unlike any known disease the pattern is
+    novel_pathogen: bool = False  # flagged when high-risk pattern matches no known disease
 
 
 # --------------------------------------------------------------------------------------

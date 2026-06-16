@@ -19,8 +19,12 @@ from ..fusion.fuser import risk_score
 from ..knowledge import KnowledgeGraphRepo, get_knowledge_graph
 from ..regions import get_district_map
 from .classifier import level_for
+from .novelty import get_novelty_detector
 
 VALID_SIGNALS = {s.value for s in SignalType}
+NOVELTY_MIN_RISK = 55.0  # only consider novelty at Alert+ severity
+NOVELTY_FLAG = 0.6  # novelty above this => candidate novel pathogen
+WEAK_MATCH_NOVEL = 0.85  # lenient: novelty is the primary discriminator, not the KG match
 WEATHER_TYPES = {
     "weather_rainfall": "rainfall",
     "weather_humidity": "humidity",
@@ -38,6 +42,7 @@ def assess(
     kg = kg or get_knowledge_graph()
     confidence_by_day = confidence_by_day or {}
     names = get_district_map()
+    novelty_detector = get_novelty_detector()
 
     grouped = _group_scores(signal_scores)
     pct_lookup, weather_lookup = _context(agg_df)
@@ -54,11 +59,23 @@ def assess(
 
         category = DiseaseCategory.UNKNOWN
         likely: list[str] = []
+        best_match = 0.0
         if risk >= WATCH_MIN and elevated:
             matches = kg.match_diseases(elevated, weather_state, top_k=3)
             if matches:
+                best_match = matches[0].score
                 category = matches[0].category
                 likely = [m.display_name for m in matches]
+
+        # Novel-pathogen detection: a high-risk pattern that the novelty model finds unlike
+        # any known disease (the novelty gate already protects genuine known presentations).
+        novelty = novelty_detector.score(elevated) if (risk >= WATCH_MIN and elevated) else 0.0
+        novel = (
+            risk >= NOVELTY_MIN_RISK and novelty >= NOVELTY_FLAG and best_match < WEAK_MATCH_NOVEL
+        )
+        if novel:
+            category = DiseaseCategory.UNKNOWN
+            likely = []
 
         pct = pct_lookup.get((district_id, day), {})
         contributions = (
@@ -78,6 +95,8 @@ def assess(
                 confidence=round(confidence, 4),
                 signal_scores={k: round(v, 4) for k, v in info["detectors"].items()},
                 contributions=contributions,
+                novelty_score=round(novelty, 4),
+                novel_pathogen=novel,
             )
         )
     return assessments

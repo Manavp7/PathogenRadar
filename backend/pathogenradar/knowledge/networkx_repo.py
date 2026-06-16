@@ -64,6 +64,9 @@ class NetworkXGraphRepo:
     def diseases(self) -> list[str]:
         return list(self._data.keys())
 
+    def disease_signals(self, disease: str) -> list[str]:
+        return list(self._data[disease].get("signals", []))
+
     def display_name(self, disease: str) -> str:
         return self._data[disease]["display_name"]
 

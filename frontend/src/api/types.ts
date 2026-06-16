@@ -17,6 +17,8 @@ export interface RiskAssessment {
   confidence: number;
   signal_scores: Record<string, number>;
   contributions: Contribution[];
+  novelty_score?: number;
+  novel_pathogen?: boolean;
 }
 
 export interface ForecastPoint {
