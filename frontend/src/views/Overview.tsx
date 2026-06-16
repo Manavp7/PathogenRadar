@@ -1,9 +1,13 @@
+import { useEffect, useState } from "react";
 import type { AppData } from "../App";
+import { api } from "../api/client";
+import type { RiskAssessment } from "../api/types";
 import AlertCard from "../components/AlertCard";
 import MapChoropleth from "../components/MapChoropleth";
 import RiskTable from "../components/RiskTable";
+import TimeMachine from "../components/TimeMachine";
 import { KpiCard } from "../components/common";
-import { riskColor } from "../lib/format";
+import { riskColor, shortDate } from "../lib/format";
 
 export default function Overview({
   data,
@@ -12,12 +16,29 @@ export default function Overview({
   data: AppData;
   onSelect: (id: string) => void;
 }) {
+  const [histDate, setHistDate] = useState<string | null>(null);
+  const [histRisk, setHistRisk] = useState<RiskAssessment[] | null>(null);
+
+  useEffect(() => {
+    if (!histDate) {
+      setHistRisk(null);
+      return;
+    }
+    let cancelled = false;
+    api.riskAt(histDate).then((r) => !cancelled && setHistRisk(r)).catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [histDate]);
+
+  const mapRisk = histRisk ?? data.risk;
   const onAlert = data.risk.filter((r) => r.level !== "Normal");
   const emergencies = data.risk.filter((r) => r.level === "Emergency" || r.level === "Alert");
   const top = [...data.risk].sort((a, b) => b.risk_score - a.risk_score)[0];
 
   return (
     <div className="grid" style={{ gap: 18 }}>
+      <TimeMachine onChange={setHistDate} />
       <div className="grid cols-4">
         <KpiCard value={data.meta.districts} label="Districts monitored" hint={data.meta.region} />
         <KpiCard
@@ -42,13 +63,20 @@ export default function Overview({
 
       <div className="split">
         <div className="panel">
-          <h3>Outbreak Risk Heatmap</h3>
-          <MapChoropleth geojson={data.geojson} risk={data.risk} onSelect={onSelect} />
+          <h3>
+            Outbreak Risk Heatmap
+            {histDate && (
+              <span className="chip" style={{ marginLeft: 10 }}>
+                historical · {shortDate(histDate)}
+              </span>
+            )}
+          </h3>
+          <MapChoropleth geojson={data.geojson} risk={mapRisk} onSelect={onSelect} />
         </div>
         <div className="grid" style={{ gap: 18, alignContent: "start" }}>
           <div className="panel">
-            <h3>Highest-Risk Districts</h3>
-            <RiskTable risk={data.risk} onSelect={onSelect} limit={6} />
+            <h3>Highest-Risk Districts{histDate ? ` · ${shortDate(histDate)}` : ""}</h3>
+            <RiskTable risk={mapRisk} onSelect={onSelect} limit={6} />
           </div>
           <div className="panel">
             <h3>Active Alerts</h3>

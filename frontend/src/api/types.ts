@@ -126,3 +126,14 @@ export interface DiseaseInfo {
   name: string;
   category: string;
 }
+
+export interface TimelinePoint {
+  date: string;
+  mean: number;
+  max: number;
+}
+
+export interface Timeline {
+  dates: string[];
+  series: TimelinePoint[];
+}

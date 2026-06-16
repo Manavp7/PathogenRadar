@@ -11,6 +11,7 @@ import type {
   SeirResult,
   SignalSeries,
   SourceReliability,
+  Timeline,
 } from "./types";
 
 async function get<T>(path: string): Promise<T> {
@@ -34,6 +35,8 @@ export const api = {
   districts: () => get<District[]>("/api/districts"),
   geojson: () => get<GeoJSON.FeatureCollection>("/api/geojson"),
   risk: () => get<RiskAssessment[]>("/api/risk"),
+  riskAt: (date: string) => get<RiskAssessment[]>(`/api/risk?as_of=${date}`),
+  timeline: () => get<Timeline>("/api/timeline"),
   riskDetail: (id: string) => get<RiskDetail>(`/api/risk/${id}`),
   forecast: () => get<DistrictForecast[]>("/api/forecast"),
   alerts: () => get<Alert[]>("/api/alerts"),

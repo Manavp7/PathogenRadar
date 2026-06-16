@@ -88,3 +88,20 @@ def test_signals_endpoint(client):
     sig = client.get("/api/signals/ernakulam").json()
     assert "series" in sig
     assert "hospital_admissions" in sig["series"]
+
+
+def test_timeline_and_historical_snapshot(client):
+    timeline = client.get("/api/timeline").json()
+    assert len(timeline["dates"]) > 30
+    assert "mean" in timeline["series"][0]
+
+    # A historical snapshot before the outbreak should be calmer than the latest.
+    early_date = timeline["dates"][5]
+    early = client.get(f"/api/risk?as_of={early_date}").json()
+    assert len(early) == 14
+    early_top = max(r["risk_score"] for r in early)
+    latest_top = max(r["risk_score"] for r in client.get("/api/risk").json())
+    assert early_top <= latest_top
+
+    # Unknown date -> 404.
+    assert client.get("/api/risk?as_of=1999-01-01").status_code == 404
