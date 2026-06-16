@@ -1,0 +1,5 @@
+# OPTIONAL machine-learning dependencies (Phase 2: GNN spread forecaster).
+# The platform runs fully without these — modules that need torch fall back gracefully.
+# Install with:  pip install -r requirements-ml.txt  (CPU-only torch)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1

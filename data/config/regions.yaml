@@ -1,0 +1,106 @@
+# PathogenRadar region definitions.
+# Adding a new state = adding a block here (and a matching GeoJSON in data/geo/).
+# The entire platform is district-aware and data-source agnostic, driven by this file.
+
+kerala:
+  name: Kerala
+  country: India
+  geojson: kerala_districts.geojson
+  geojson_name_property: DISTRICT   # property in the GeoJSON that holds the district name
+  districts:
+    - id: kasaragod
+      name: Kasaragod
+      population: 1307375
+      lat: 12.4996
+      lon: 74.9869
+      neighbors: [kannur]
+    - id: kannur
+      name: Kannur
+      population: 2523003
+      lat: 11.8745
+      lon: 75.3704
+      neighbors: [kasaragod, wayanad, kozhikode]
+    - id: wayanad
+      name: Wayanad
+      population: 817420
+      lat: 11.6854
+      lon: 76.1320
+      neighbors: [kannur, kozhikode, malappuram]
+    - id: kozhikode
+      name: Kozhikode
+      population: 3086293
+      lat: 11.2588
+      lon: 75.7804
+      neighbors: [kannur, wayanad, malappuram]
+    - id: malappuram
+      name: Malappuram
+      population: 4112920
+      lat: 11.0510
+      lon: 76.0711
+      neighbors: [kozhikode, wayanad, palakkad, thrissur]
+    - id: palakkad
+      name: Palakkad
+      population: 2809934
+      lat: 10.7867
+      lon: 76.6548
+      neighbors: [malappuram, thrissur]
+    - id: thrissur
+      name: Thrissur
+      population: 3121200
+      lat: 10.5276
+      lon: 76.2144
+      neighbors: [palakkad, malappuram, ernakulam, idukki]
+    - id: ernakulam
+      name: Ernakulam
+      population: 3282388
+      lat: 9.9816
+      lon: 76.2999
+      neighbors: [thrissur, idukki, kottayam, alappuzha]
+    - id: idukki
+      name: Idukki
+      population: 1108974
+      lat: 9.8497
+      lon: 76.9560
+      neighbors: [thrissur, ernakulam, kottayam, pathanamthitta]
+    - id: kottayam
+      name: Kottayam
+      population: 1974551
+      lat: 9.5916
+      lon: 76.5222
+      neighbors: [ernakulam, idukki, alappuzha, pathanamthitta]
+    - id: alappuzha
+      name: Alappuzha
+      population: 2127789
+      lat: 9.4981
+      lon: 76.3388
+      neighbors: [ernakulam, kottayam, pathanamthitta, kollam]
+    - id: pathanamthitta
+      name: Pathanamthitta
+      population: 1197412
+      lat: 9.2648
+      lon: 76.7870
+      neighbors: [kottayam, idukki, alappuzha, kollam]
+    - id: kollam
+      name: Kollam
+      population: 2635375
+      lat: 8.8932
+      lon: 76.6141
+      neighbors: [alappuzha, pathanamthitta, thiruvananthapuram]
+    - id: thiruvananthapuram
+      name: Thiruvananthapuram
+      population: 3301427
+      lat: 8.5241
+      lon: 76.9366
+      neighbors: [kollam]
+
+# Tamil Nadu is defined WITHOUT an explicit district list: districts (centroids, populations,
+# adjacency) are auto-derived from the GeoJSON at load time. This demonstrates that adding a
+# state is configuration, not re-engineering. Populations are area-share estimates of the
+# state total (2011 census) — clearly approximate for a second-region demo.
+tamil_nadu:
+  name: Tamil Nadu
+  country: India
+  geojson: tamil_nadu_districts.geojson
+  geojson_name_property: DISTRICT
+  derive_from_geojson: true
+  total_population: 72147030
