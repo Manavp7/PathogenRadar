@@ -47,7 +47,11 @@ def get_system() -> dict:
             "policy": s.alerting_policy,
             "rl_alert_threshold": _rl_threshold(),
         },
-        "security": {"api_key_required": bool(s.api_key)},
+        "security": {
+            "api_key_required": s.auth_enabled,
+            "rbac_enabled": s.auth_enabled,
+            "roles": ["viewer", "analyst", "minister", "admin"],
+        },
         "regions": state.available(),
         "default_region": state.default_region,
         "warnings": s.warnings(),

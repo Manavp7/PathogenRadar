@@ -79,6 +79,7 @@ export const api = {
   national: () => get<National>("/api/national"),
   genomics: (region?: string) => get<Genomics>(`/api/genomics${qs({ region })}`),
   system: () => get<SystemStatus>("/api/system"),
+  audit: () => get<import("./types").AuditEntry[]>("/api/audit"),
   diseases: () => get<DiseaseInfo[]>("/api/diseases"),
 
   meta: (region?: string) => get<Meta>(`/api/meta${qs({ region })}`),

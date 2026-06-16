@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from ..domain.models import Intervention, SeirResult
 from ..knowledge import get_knowledge_graph
+from ..security.rbac import require_permission
 from ..simulation.seir import simulate
 
 router = APIRouter(prefix="/api", tags=["simulation"])
@@ -20,7 +21,11 @@ class SimulationRequest(BaseModel):
     intervention: Intervention = Field(default_factory=Intervention)
 
 
-@router.post("/simulation", response_model=SeirResult)
+@router.post(
+    "/simulation",
+    response_model=SeirResult,
+    dependencies=[Depends(require_permission("simulate"))],
+)
 def run_simulation(req: SimulationRequest, region: str | None = Query(default=None)) -> SeirResult:
     kg = get_knowledge_graph()
     if req.disease not in kg.diseases():

@@ -68,6 +68,26 @@ class Settings:
 
     # Optional API security. If unset, the API runs open (dev mode).
     api_key: str | None = field(default_factory=lambda: os.getenv("PATHOGENRADAR_API_KEY") or None)
+    # Optional role mapping: "key1:admin,key2:analyst,key3:viewer".
+    api_keys_raw: str | None = field(
+        default_factory=lambda: os.getenv("PATHOGENRADAR_API_KEYS") or None
+    )
+
+    def api_key_map(self) -> dict[str, str]:
+        """Map of api-key -> role. ``PATHOGENRADAR_API_KEY`` (if set) is an admin key."""
+        m: dict[str, str] = {}
+        if self.api_keys_raw:
+            for pair in self.api_keys_raw.split(","):
+                if ":" in pair:
+                    key, role = pair.split(":", 1)
+                    m[key.strip()] = role.strip().lower()
+        if self.api_key:
+            m.setdefault(self.api_key, "admin")
+        return m
+
+    @property
+    def auth_enabled(self) -> bool:
+        return bool(self.api_key_map())
 
     @property
     def region_config_path(self) -> Path:

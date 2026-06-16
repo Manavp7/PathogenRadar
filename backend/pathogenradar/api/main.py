@@ -13,9 +13,11 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from .. import __version__
-from ..security.auth import audit_logger, require_api_key
+from ..security.auth import audit_logger, record_audit, require_api_key
+from ..security.rbac import resolve_principal
 from . import (
     routes_alerts,
+    routes_audit,
     routes_districts,
     routes_forecast,
     routes_genomics,
@@ -53,13 +55,21 @@ async def audit_middleware(request: Request, call_next):
     started = time.time()
     response = await call_next(request)
     elapsed_ms = (time.time() - started) * 1000
+    principal = resolve_principal(request.headers.get("x-api-key"))
+    role = principal.role if principal else "anonymous"
+    key_id = principal.key_id if principal else "-"
     audit_logger.info(
-        "%s %s -> %s (%.1f ms)",
+        "%s %s -> %s role=%s (%.1f ms)",
         request.method,
         request.url.path,
         response.status_code,
+        role,
         elapsed_ms,
     )
+    if request.url.path.startswith("/api/"):
+        record_audit(
+            request.method, request.url.path, response.status_code, role, key_id, elapsed_ms
+        )
     return response
 
 
@@ -90,3 +100,4 @@ app.include_router(routes_reports.router, dependencies=_auth)
 app.include_router(routes_system.router, dependencies=_auth)
 app.include_router(routes_national.router, dependencies=_auth)
 app.include_router(routes_genomics.router, dependencies=_auth)
+app.include_router(routes_audit.router, dependencies=_auth)

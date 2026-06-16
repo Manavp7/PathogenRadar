@@ -146,7 +146,19 @@ export interface SystemStatus {
   offline_mode: boolean;
   connectors: Record<string, { enabled: boolean; live: boolean }>;
   llm: { provider: string; key_present: boolean; required: boolean };
-  security: { api_key_required: boolean };
-  data: { as_of: string | null; source_summary: Record<string, string> };
+  forecast_model?: string;
+  alerting?: { policy: string; rl_alert_threshold: number | null };
+  security: { api_key_required: boolean; rbac_enabled?: boolean; roles?: string[] };
+  regions?: string[];
   warnings: string[];
+}
+
+export interface AuditEntry {
+  ts: string;
+  method: string;
+  path: string;
+  status: number;
+  role: string;
+  principal: string;
+  ms: number;
 }

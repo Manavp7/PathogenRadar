@@ -1,27 +1,42 @@
-"""Lightweight security: optional API-key auth and an audit log.
+"""Authentication + audit primitives.
 
-Full RBAC / ABDM / HIPAA controls are a later phase. By default (no key configured) the API
-runs open for local development; setting ``PATHOGENRADAR_API_KEY`` enforces the header.
+``require_api_key`` enforces the "read" permission (the baseline for all data routes). Higher
+permissions are enforced per-route via :func:`pathogenradar.security.rbac.require_permission`.
+By default (no keys configured) the API runs open for local development.
 """
 
 from __future__ import annotations
 
 import logging
+from collections import deque
+from datetime import UTC, datetime
 
-from fastapi import Header, HTTPException, status
-
-from ..config import get_settings
+from .rbac import require_permission
 
 audit_logger = logging.getLogger("pathogenradar.audit")
 
+# Baseline gate for all data routers.
+require_api_key = require_permission("read")
 
-async def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
-    """FastAPI dependency enforcing the API key when one is configured."""
-    settings = get_settings()
-    if not settings.api_key:
-        return  # open dev mode
-    if x_api_key != settings.api_key:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing API key",
-        )
+# In-memory audit trail (most recent first via reversed access).
+_AUDIT: deque[dict] = deque(maxlen=1000)
+
+
+def record_audit(
+    method: str, path: str, status_code: int, role: str, key_id: str, ms: float
+) -> None:
+    _AUDIT.append(
+        {
+            "ts": datetime.now(UTC).isoformat(timespec="seconds"),
+            "method": method,
+            "path": path,
+            "status": status_code,
+            "role": role,
+            "principal": key_id,
+            "ms": round(ms, 1),
+        }
+    )
+
+
+def recent_audit(limit: int = 200) -> list[dict]:
+    return list(reversed(_AUDIT))[:limit]
