@@ -44,6 +44,12 @@ def build_connectors(outbreaks: list[OutbreakEvent] | None = None) -> list[Conne
         logger.info("OpenWeather connector ENABLED")
         connectors.append(OpenWeatherConnector(settings.openweather_api_key))
 
+    if settings.fhir_base_url:
+        from .fhir import FHIRConnector
+
+        logger.info("ABDM/FHIR connector ENABLED (%s)", settings.fhir_base_url)
+        connectors.append(FHIRConnector(base_url=settings.fhir_base_url))
+
     return connectors
 
 

@@ -35,6 +35,7 @@ def get_system() -> dict:
                 "enabled": bool(s.openweather_api_key),
                 "live": bool(s.openweather_api_key),
             },
+            "abdm_fhir": {"enabled": bool(s.fhir_base_url), "live": bool(s.fhir_base_url)},
         },
         "llm": {
             "provider": s.llm_provider,

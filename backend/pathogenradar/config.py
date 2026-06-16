@@ -46,6 +46,8 @@ class Settings:
     enable_google_trends: bool = field(
         default_factory=lambda: _get_bool("ENABLE_GOOGLE_TRENDS", False)
     )
+    # Optional ABDM/FHIR hospital feed (Phase 3). Disabled unless a base URL is configured.
+    fhir_base_url: str | None = field(default_factory=lambda: os.getenv("FHIR_BASE_URL") or None)
 
     # Optional LLM provider. Default: template (no AI, no network).
     llm_provider: str = field(default_factory=lambda: os.getenv("LLM_PROVIDER", "template"))
@@ -78,7 +80,7 @@ class Settings:
     @property
     def offline_mode(self) -> bool:
         """True when no external services are configured (the default state)."""
-        return not (self.openweather_api_key or self.enable_google_trends)
+        return not (self.openweather_api_key or self.enable_google_trends or self.fhir_base_url)
 
     def llm_key_present(self) -> bool:
         """Whether the selected LLM provider has a usable credential."""
