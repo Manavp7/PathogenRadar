@@ -58,6 +58,12 @@ class Settings:
         default_factory=lambda: os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
     )
 
+    # Forecast + alerting model selection (Phase 2).
+    forecast_model: str = field(
+        default_factory=lambda: os.getenv("FORECAST_MODEL", "deterministic")
+    )
+    alerting_policy: str = field(default_factory=lambda: os.getenv("ALERTING_POLICY", "fixed"))
+
     # Optional API security. If unset, the API runs open (dev mode).
     api_key: str | None = field(default_factory=lambda: os.getenv("PATHOGENRADAR_API_KEY") or None)
 

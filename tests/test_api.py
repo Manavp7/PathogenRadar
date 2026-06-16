@@ -97,6 +97,8 @@ def test_system_status(client):
     assert sys["llm"]["provider"] == "template"
     assert sys["llm"]["required"] is False
     assert sys["security"]["api_key_required"] is False
+    assert sys["forecast_model"] == "deterministic"  # default; gnn is opt-in
+    assert sys["alerting"]["policy"] == "fixed"
     assert isinstance(sys["warnings"], list)
 
 

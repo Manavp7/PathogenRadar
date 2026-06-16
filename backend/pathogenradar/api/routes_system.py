@@ -12,6 +12,15 @@ from .state import state
 router = APIRouter(prefix="/api", tags=["system"])
 
 
+def _rl_threshold():
+    try:
+        from ..rl.agent import load_alert_threshold
+
+        return load_alert_threshold()
+    except Exception:  # noqa: BLE001
+        return None
+
+
 @router.get("/system")
 def get_system() -> dict:
     s = get_settings()
@@ -33,6 +42,10 @@ def get_system() -> dict:
             "required": False,
         },
         "forecast_model": active_model(),
+        "alerting": {
+            "policy": s.alerting_policy,
+            "rl_alert_threshold": _rl_threshold(),
+        },
         "security": {"api_key_required": bool(s.api_key)},
         "data": {
             "as_of": state.meta.get("as_of"),
