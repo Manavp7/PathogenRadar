@@ -80,6 +80,11 @@ export const api = {
   genomics: (region?: string) => get<Genomics>(`/api/genomics${qs({ region })}`),
   system: () => get<SystemStatus>("/api/system"),
   audit: () => get<import("./types").AuditEntry[]>("/api/audit"),
+  models: (region?: string) =>
+    get<{
+      models: { name: string; version: string; framework: string; metrics: Record<string, number> }[];
+      drift: { max_psi: number; retrain_recommended: boolean; drifting_signals: string[] };
+    }>(`/api/system/models${qs({ region })}`),
   diseases: () => get<DiseaseInfo[]>("/api/diseases"),
 
   meta: (region?: string) => get<Meta>(`/api/meta${qs({ region })}`),

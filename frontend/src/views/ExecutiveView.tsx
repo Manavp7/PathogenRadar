@@ -2,6 +2,7 @@ import type { AppData } from "../App";
 import AlertCard from "../components/AlertCard";
 import AuditPanel from "../components/AuditPanel";
 import BriefingPanel from "../components/BriefingPanel";
+import ModelsPanel from "../components/ModelsPanel";
 import RiskTable from "../components/RiskTable";
 import SystemStatus from "../components/SystemStatus";
 import { KpiCard } from "../components/common";
@@ -97,6 +98,7 @@ export default function ExecutiveView({
         <div className="grid" style={{ gap: 18, alignContent: "start" }}>
           <BriefingPanel />
           <SystemStatus />
+          <ModelsPanel />
           <AuditPanel />
         </div>
       </div>

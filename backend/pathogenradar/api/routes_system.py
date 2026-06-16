@@ -2,14 +2,24 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from .. import __version__
 from ..config import get_settings
 from ..forecast.service import active_model
-from .state import state
+from ..mlops import drift_report, list_latest
+from .deps import region_state
+from .state import RegionState, state
 
 router = APIRouter(prefix="/api", tags=["system"])
+
+
+@router.get("/system/models")
+def get_models(rs: RegionState = Depends(region_state)) -> dict:
+    return {
+        "models": list_latest(),
+        "drift": drift_report(rs.key),
+    }
 
 
 def _rl_threshold():
