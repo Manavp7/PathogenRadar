@@ -77,13 +77,15 @@ def simulate(
     initial_infected: float | None = None,
     kg: KnowledgeGraphRepo | None = None,
     region: str | None = None,
+    r0_multiplier: float = 1.0,
 ) -> SeirResult:
     kg = kg or get_knowledge_graph()
     district = get_district(district_id, region)
     epi = kg.epi_params(disease)
 
     population = float(district.population)
-    beta = epi.r0 / epi.infectious_days
+    effective_r0 = epi.r0 * max(0.1, r0_multiplier)  # genomic transmissibility coupling
+    beta = effective_r0 / epi.infectious_days
     sigma = 1.0 / max(epi.incubation_days, 0.5)
     gamma = 1.0 / max(epi.infectious_days, 0.5)
 
@@ -97,8 +99,8 @@ def simulate(
         district_id=district_id,
         disease=disease,
         population=int(population),
-        r0=round(epi.r0, 3),
-        effective_r=round(epi.r0 * (1.0 - i0 / population), 3),
+        r0=round(effective_r0, 3),
+        effective_r=round(effective_r0 * (1.0 - i0 / population), 3),
         baseline=baseline,
         peak_infected_baseline=round(peak_b, 1),
         peak_day_baseline=peak_day_b,
@@ -113,7 +115,7 @@ def simulate(
         cases_baseline = population - baseline.susceptible[-1]
         cases_inter = (population * (1 - vacc)) - inter.susceptible[-1]
         result.intervention = inter
-        result.effective_r = round(epi.r0 * mult * (1.0 - vacc) * (1.0 - i0 / population), 3)
+        result.effective_r = round(effective_r0 * mult * (1.0 - vacc) * (1.0 - i0 / population), 3)
         result.peak_infected_intervention = round(peak_i, 1)
         result.peak_day_intervention = peak_day_i
         result.cases_averted = round(max(0.0, cases_baseline - cases_inter), 1)

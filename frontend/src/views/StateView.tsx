@@ -1,4 +1,5 @@
 import type { AppData } from "../App";
+import GenomicsPanel from "../components/GenomicsPanel";
 import MapChoropleth from "../components/MapChoropleth";
 import RiskTable from "../components/RiskTable";
 import { fmtPct } from "../lib/format";
@@ -76,6 +77,8 @@ export default function StateView({
           </div>
         </div>
       </div>
+
+      <GenomicsPanel />
     </div>
   );
 }

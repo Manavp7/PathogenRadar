@@ -18,6 +18,7 @@ from . import (
     routes_alerts,
     routes_districts,
     routes_forecast,
+    routes_genomics,
     routes_national,
     routes_reports,
     routes_risk,
@@ -88,3 +89,4 @@ app.include_router(routes_signals.router, dependencies=_auth)
 app.include_router(routes_reports.router, dependencies=_auth)
 app.include_router(routes_system.router, dependencies=_auth)
 app.include_router(routes_national.router, dependencies=_auth)
+app.include_router(routes_genomics.router, dependencies=_auth)

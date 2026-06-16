@@ -41,6 +41,18 @@ export interface RegionInfo {
   regions: { key: string; name: string; districts: number }[];
 }
 
+export interface Genomics {
+  region: string;
+  note: string;
+  variants: { id: string; name: string; transmissibility: number; severity: number }[];
+  dates: string[];
+  series: Record<string, number[]>;
+  current_mix: { id: string; name: string; share: number }[];
+  emerging: { variant: string; name: string; current_share: number; slope: number }[];
+  r0_multiplier: number;
+  severity_multiplier: number;
+}
+
 export interface National {
   regions: {
     key: string;
@@ -65,6 +77,7 @@ export interface National {
 export const api = {
   regions: () => get<RegionInfo>("/api/regions"),
   national: () => get<National>("/api/national"),
+  genomics: (region?: string) => get<Genomics>(`/api/genomics${qs({ region })}`),
   system: () => get<SystemStatus>("/api/system"),
   diseases: () => get<DiseaseInfo[]>("/api/diseases"),
 
