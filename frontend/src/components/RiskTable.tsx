@@ -14,11 +14,11 @@ export default function RiskTable({ risk, selected, onSelect, limit }: Props) {
     <table className="data">
       <thead>
         <tr>
-          <th>District</th>
-          <th>Risk</th>
-          <th></th>
-          <th>Level</th>
-          <th>Category</th>
+          <th scope="col">District</th>
+          <th scope="col">Risk</th>
+          <th scope="col" aria-label="Risk bar"></th>
+          <th scope="col">Level</th>
+          <th scope="col">Category</th>
         </tr>
       </thead>
       <tbody>
@@ -27,6 +27,18 @@ export default function RiskTable({ risk, selected, onSelect, limit }: Props) {
             key={r.district_id}
             className={selected === r.district_id ? "selected" : ""}
             onClick={() => onSelect?.(r.district_id)}
+            tabIndex={onSelect ? 0 : undefined}
+            aria-label={
+              onSelect
+                ? `${r.district_name}, risk ${r.risk_score.toFixed(0)}, ${r.level}`
+                : undefined
+            }
+            onKeyDown={(e) => {
+              if (onSelect && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                onSelect(r.district_id);
+              }
+            }}
           >
             <td>{r.district_name}</td>
             <td style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>

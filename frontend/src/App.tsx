@@ -77,19 +77,23 @@ export default function App() {
 
   return (
     <div className="app">
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
       <header className="topbar">
         <div className="brand">
-          <div className="logo" />
+          <div className="logo" aria-hidden="true" />
           <div>
             <div className="title">PathogenRadar</div>
             <div className="subtitle">Disease Intelligence Platform</div>
           </div>
         </div>
-        <nav className="nav">
+        <nav className="nav" aria-label="Primary views">
           {TABS.map((t) => (
             <button
               key={t.id}
               className={view === t.id ? "active" : ""}
+              aria-current={view === t.id ? "page" : undefined}
               onClick={() => setView(t.id)}
             >
               {t.label}
@@ -97,15 +101,15 @@ export default function App() {
           ))}
         </nav>
         <div className="spacer" />
-        <div className="status">
+        <div className="status" role="status">
           {data && <span>{data.meta.region}</span>}
           {headerDate && <span>· as of {headerDate}</span>}
-          <span className={`dot ${connected ? "" : "off"}`} />
+          <span className={`dot ${connected ? "" : "off"}`} aria-hidden="true" />
           {connected ? "Live" : "Offline"}
         </div>
       </header>
 
-      <main className="content">
+      <main className="content" id="main">
         {error && (
           <div className="center-msg">
             <div>⚠ Cannot reach the PathogenRadar API.</div>
