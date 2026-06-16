@@ -18,6 +18,7 @@ from pathogenradar.detection.engine import latest_by_district  # noqa: E402
 from pathogenradar.domain.models import Intervention  # noqa: E402
 from pathogenradar.llm.briefing import generate_briefing  # noqa: E402
 from pathogenradar.pipeline import golden_scenario  # noqa: E402
+from pathogenradar.scenarios import run_scenario  # noqa: E402
 from pathogenradar.simulation.seir import simulate  # noqa: E402
 
 BAR = "=" * 78
@@ -28,11 +29,16 @@ def step(n: int, title: str) -> None:
 
 
 def main() -> None:
-    print("PathogenRadar — end-to-end disease intelligence walkthrough (Kerala)")
+    scenario = sys.argv[1] if len(sys.argv) > 1 else "dengue"
+    print(f"PathogenRadar — end-to-end disease intelligence walkthrough (Kerala) [{scenario}]")
     district = "ernakulam"
 
-    step(1, "Acquire signals + inject a synthetic dengue outbreak")
-    result = golden_scenario(district_id=district, persist=True)
+    step(1, f"Acquire signals + inject the '{scenario}' scenario")
+    result = (
+        golden_scenario(district_id=district, persist=True)
+        if scenario == "dengue"
+        else run_scenario(scenario, persist=True)
+    )
     print(f"  region={result.region}  window={result.start}..{result.end}")
     print(f"  data sources: {result.source_summary}")
     print(

@@ -1,7 +1,8 @@
 """Generate synthetic data and run the full pipeline once, persisting artifacts.
 
-Runs the flagship dengue scenario so the dashboard has a meaningful story out of the box.
-Usage:  python scripts/seed.py
+Runs a named scenario (default: multi — simultaneous vector + respiratory + waterborne
+outbreaks) so the dashboard has a rich story out of the box.
+Usage:  python scripts/seed.py [scenario]   # scenario in {dengue,respiratory,waterborne,multi}
 """
 
 from __future__ import annotations
@@ -11,12 +12,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
-from pathogenradar.pipeline import golden_scenario  # noqa: E402
+from pathogenradar.scenarios import SCENARIOS, run_scenario  # noqa: E402
 
 
 def main() -> None:
-    print("PathogenRadar — seeding flagship dengue scenario (Kerala)...")
-    result = golden_scenario()
+    scenario = sys.argv[1] if len(sys.argv) > 1 else "multi"
+    if scenario not in SCENARIOS:
+        print(f"Unknown scenario '{scenario}'. Options: {', '.join(SCENARIOS)}")
+        sys.exit(1)
+    print(f"PathogenRadar — seeding '{scenario}' scenario (Kerala)...")
+    result = run_scenario(scenario)
     on_alert = [a for a in result.alerts]
     print(f"  region        : {result.region}")
     print(f"  window        : {result.start} -> {result.end}")

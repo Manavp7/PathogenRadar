@@ -6,6 +6,8 @@ and observable signals, and ranks candidate diseases against observed evidence.
 
 from __future__ import annotations
 
+import math
+from collections import Counter
 from pathlib import Path
 
 import networkx as nx
@@ -22,6 +24,21 @@ class NetworkXGraphRepo:
         with open(path or DISEASES_FILE, encoding="utf-8") as fh:
             self._data = yaml.safe_load(fh)["diseases"]
         self._graph = self._build_graph()
+        self._idf = self._compute_idf()
+
+    def _compute_idf(self) -> dict[str, float]:
+        """Inverse-document-frequency weight per signal.
+
+        A signal listed by many diseases (e.g. hospital_admissions) is weak evidence for any
+        particular one; a distinctive signal (cough, rash, diarrhea) is strong evidence. This
+        prevents diseases that share many generic signals from dominating classification.
+        """
+        n = len(self._data)
+        df: Counter[str] = Counter()
+        for info in self._data.values():
+            for sig in set(info.get("signals", [])):
+                df[sig] += 1
+        return {sig: math.log((1 + n) / (1 + count)) + 1.0 for sig, count in df.items()}
 
     def _build_graph(self) -> nx.Graph:
         g = nx.Graph()
@@ -77,21 +94,23 @@ class NetworkXGraphRepo:
             disease_signals = set(info.get("signals", []))
             if not disease_signals:
                 continue
-            # Signal overlap weighted by elevation strength.
+            # IDF-weighted overlap: distinctive symptoms dominate over generic ones.
             matched = {s: elevated_signals[s] for s in disease_signals if s in elevated_signals}
             if not matched:
                 continue
-            signal_score = sum(matched.values()) / len(disease_signals)
+            weighted_match = sum(elevated_signals[s] * self._idf.get(s, 1.0) for s in matched)
+            total_weight = sum(self._idf.get(s, 1.0) for s in disease_signals)
+            signal_score = weighted_match / total_weight if total_weight else 0.0
 
-            # Weather corroboration: reward when a positive driver is currently "high".
+            # Weather corroboration: a small tiebreaker, never a dominant term.
             weather_bonus = 0.0
             drivers = info.get("weather_drivers", {})
             for driver, effect in drivers.items():
                 state = weather_context.get(driver)
                 if effect == "positive" and state == "high":
-                    weather_bonus += 0.15
+                    weather_bonus += 0.04
                 elif effect == "negative" and state == "low":
-                    weather_bonus += 0.10
+                    weather_bonus += 0.03
 
             score = min(1.0, signal_score + weather_bonus)
             matches.append(

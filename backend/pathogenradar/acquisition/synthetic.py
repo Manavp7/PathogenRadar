@@ -78,12 +78,20 @@ def dengue_outbreak(
     )
 
 
-def respiratory_outbreak(district_id: str, start: date, magnitude: float = 1.4) -> OutbreakEvent:
+def respiratory_outbreak(
+    district_id: str,
+    start: date,
+    magnitude: float = 1.4,
+    duration_days: int = 50,
+    peak_day_offset: int = 22,
+) -> OutbreakEvent:
     return OutbreakEvent(
         disease="Influenza-like illness",
         category=DiseaseCategory.RESPIRATORY,
         district_id=district_id,
         start=start,
+        duration_days=duration_days,
+        peak_day_offset=peak_day_offset,
         magnitude=magnitude,
         signal_weights={
             SignalType.SEARCH_FEVER: 0.9,
@@ -98,14 +106,20 @@ def respiratory_outbreak(district_id: str, start: date, magnitude: float = 1.4) 
     )
 
 
-def waterborne_outbreak(district_id: str, start: date, magnitude: float = 1.5) -> OutbreakEvent:
+def waterborne_outbreak(
+    district_id: str,
+    start: date,
+    magnitude: float = 1.5,
+    duration_days: int = 35,
+    peak_day_offset: int = 14,
+) -> OutbreakEvent:
     return OutbreakEvent(
         disease="Acute diarrheal disease",
         category=DiseaseCategory.WATERBORNE,
         district_id=district_id,
         start=start,
-        duration_days=35,
-        peak_day_offset=14,
+        duration_days=duration_days,
+        peak_day_offset=peak_day_offset,
         magnitude=magnitude,
         signal_weights={
             SignalType.SEARCH_DIARRHEA: 1.0,
