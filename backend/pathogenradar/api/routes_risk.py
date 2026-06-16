@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
+from .pagination import paginate
 from .state import state
 
 router = APIRouter(prefix="/api", tags=["risk"])
 
 
 @router.get("/risk")
-def get_risk() -> list[dict]:
+def get_risk(
+    limit: int | None = Query(default=None, ge=1, le=1000),
+    offset: int = Query(default=0, ge=0),
+) -> list[dict]:
     """Latest risk assessment per district, sorted by risk (for the heatmap)."""
-    return state.risk_latest
+    return paginate(state.risk_latest, limit, offset)
 
 
 @router.get("/risk/{district_id}")

@@ -23,6 +23,7 @@ from . import (
     routes_signals,
     routes_simulation,
 )
+from .errors import register_exception_handlers
 from .state import state
 
 logging.basicConfig(level=logging.INFO)
@@ -40,6 +41,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+register_exception_handlers(app)
 
 
 @app.middleware("http")
