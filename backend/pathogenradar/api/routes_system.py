@@ -6,6 +6,7 @@ from fastapi import APIRouter
 
 from .. import __version__
 from ..config import get_settings
+from ..forecast.service import active_model
 from .state import state
 
 router = APIRouter(prefix="/api", tags=["system"])
@@ -31,6 +32,7 @@ def get_system() -> dict:
             "key_present": s.llm_key_present(),
             "required": False,
         },
+        "forecast_model": active_model(),
         "security": {"api_key_required": bool(s.api_key)},
         "data": {
             "as_of": state.meta.get("as_of"),

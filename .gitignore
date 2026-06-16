@@ -16,6 +16,7 @@ data/seed/*
 !data/seed/.gitkeep
 data/cache/*
 !data/cache/.gitkeep
+data/models/
 
 # Node / frontend
 node_modules/
